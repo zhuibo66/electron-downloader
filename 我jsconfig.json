@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "ipcRenderer/*"
+            ],
+            "@images/*": [
+                "ipcRenderer/assets/images/*"
+            ],
+            "@styles/*": [
+                "ipcRenderer/assets/styles/*"
+            ]
+        },
+        "target": "es5",
+        "experimentalDecorators": true,
+    },
+    "include": [
+        "ipcRenderer/**/*"
+    ],
+    "exclude": ["node_modules"],
+}

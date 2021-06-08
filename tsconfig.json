@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "ipcRenderer/*"
+            ],
+            "@images/*": [
+                "ipcRenderer/assets/images/*"
+            ],
+            "@styles/*": [
+                "ipcRenderer/assets/styles/*"
+            ]
+        },
+        "experimentalDecorators": true,//有使用装饰器要添加
+        "esModuleInterop": true,
+        "jsx": "react",
+        
+    },
+    "include": [
+        "ipcRenderer/**/*"
+    ],
+    "exclude": ["node_modules"],
+}
