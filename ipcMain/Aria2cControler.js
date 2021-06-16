@@ -15,12 +15,12 @@ module.exports = {
   getAriaProc: () => {
     return ariaProc;
   },
-  launchAria: () => {
+  launchAria: async () => {
     console.log("launchAria get called");
     // const dhtPath = path.join(__dirname, "save", "dht.dat");
     const sessionPath = path.join(__dirname, "save", "session");
     //获取用户下载目录的路径
-    const downloadPath = ipcRenderer.sendSync("getDownloadDir");
+    const downloadPath = await ipcRenderer.invoke("getDownloadDir");
     console.log(downloadPath, "downloadPath");
     const ariaPath =
       process.platform === "win32"
@@ -29,7 +29,9 @@ module.exports = {
         ? path.join(__dirname, "../", "bin", "macOS", "aria2c")
         : "aria2c";
     const args = [
-      `--dir=${downloadPath}`,
+      // `--dir=${downloadPath}`,
+      //添加代理用以调试
+      // "--all-proxy=127.0.0.1:8888",
       "--enable-rpc=true",
       `--rpc-listen-port=6800`,
       `--rpc-secret=${secret}`,

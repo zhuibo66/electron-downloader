@@ -1,2 +1,6 @@
 {
+    "liveServer.settings.port": 5501,
+    "less.compile": {
+        "out": false
+    }
 }

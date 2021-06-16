@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, ipcRenderer } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 const path = require("path");
 const { getAriaProc, killAriaProc } = require("./Aria2cControler");
 // const log=require('electron-log');
@@ -15,7 +15,7 @@ function createWindow() {
       preload: path.join(__dirname, "/preload.js"),
     },
   });
-    mainWindow.loadURL(`http://localhost:8080/`);
+  mainWindow.loadURL(`http://localhost:8080/`);
   // mainWindow.loadURL(path.join("file://", __dirname, "../build/index.html"));
   // mainWindow.loadFile(path.join(__dirname, "../build/index.html"));
   mainWindow.webContents.openDevTools();
@@ -64,7 +64,25 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
 //获取用户下载目录的路径
-ipcMain.on("getDownloadDir", (event) => {
-  event.returnValue = app.getPath("downloads");
+ipcMain.handle("getDownloadDir", (event) => {
+  return app.getPath("downloads");
 });
+
+/**
+ * 打开文件选择框
+ * @param oldPath - 上一次打开的路径
+ */
+ipcMain.handle(
+  "openFileDialog",
+  async (event, oldPath = app.getPath("downloads")) => {
+    if (!mainWindow) return oldPath;
+    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+      title: "选择保存位置",
+      properties: ["openDirectory", "createDirectory"],
+      defaultPath: oldPath,
+    });
+    return !canceled ? filePaths[0] : oldPath;
+  }
+);

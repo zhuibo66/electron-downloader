@@ -41,6 +41,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(le|c)ss$/,
+        use: ["style-loader", "css-loader", "less-loader"],
+      }, //less的loader
+      {
         test: /\.(js|mjs|jsx|ts|tsx)$/, //配置要处理的文件格式，一般使用正则表达式匹配
         exclude: /node_modules/,
         // loader: require.resolve("babel-loader"), //使用的加载器名称

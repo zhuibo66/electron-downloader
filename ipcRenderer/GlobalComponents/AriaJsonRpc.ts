@@ -42,11 +42,7 @@ export default class AriaJsonRpc {
     this.hasBeenOpen = false;
   }
 
-  connect(
-    onOpen: () => void,
-    onConnClose: () => void,
-    onConnErr: () => void
-  ) {
+  connect(onOpen: () => void, onConnClose: () => void, onConnErr: () => void) {
     const socket = new WebSocket(this.url);
     //JsonRPC 一个函数指针，使用前需要确定。将被调用以向远程主机发送消息
     this.jrpc.toStream = (_msg) => {
@@ -127,6 +123,25 @@ export default class AriaJsonRpc {
       throw error;
     }
   }
+  
+  getFileName(file) {
+    if (!file) {
+      return "";
+    }
+
+    let { path } = file;
+    if (!path && file.uris && file.uris.length > 0) {
+      path = decodeURI(file.uris[0].uri);
+    }
+
+    const index = path.lastIndexOf("/");
+
+    if (index <= 0 || index === path.length) {
+      return path;
+    }
+
+    return path.substring(index + 1);
+  }
 
   async getTasksAndStatus() {
     const methods = getAllTasksMethods.concat([
@@ -139,10 +154,10 @@ export default class AriaJsonRpc {
     const tasks: Map<string, any> = new Map();
     for (const ts of [active, waiting, stopped]) {
       for (const t of ts) {
+        t.fileName = this.getFileName(t.files[0]);
         tasks.set(t.gid, t);
       }
     }
-    console.log(tasks, "tasks");
     return { tasks, stat: stat as any };
   }
 }
