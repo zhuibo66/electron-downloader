@@ -427,7 +427,7 @@ const App = () => {
     } = data;
     return (
       <div className="download-info">
-        {status == "complete" ? (
+        {status == "complete" || status == "noLocalFile" ? (
           <span>{Utils.mertic(totalLength)}</span>
         ) : (
           <span>
@@ -435,13 +435,11 @@ const App = () => {
             {Utils.mertic(totalLength) || "未知"}
           </span>
         )}
-        {status == "removed" ? (
+        {status == "removed" || status == "noLocalFile" ? (
           <span>文件已删除</span>
         ) : status == "error" ? (
-          <span>下载失败{errorMessage}</span>
-        ) : status == "complete" ? (
-          <span>下载完成</span>
-        ) : status == "paused" ? (
+          <span>下载失败：{errorMessage}</span>
+        ) : status == "complete" ? null : status == "paused" ? (
           <span>0 B/s</span>
         ) : (
           <span>{Utils.mertic(downloadSpeed)}/s</span>
@@ -478,12 +476,17 @@ const App = () => {
       case "complete":
         actionsArr.push(
           <>
-            <span>下载完成</span>
-            <span onClick={() => handleOpenFileOrFolder("file", files[0].path)}>
+            <span
+              onClick={() =>
+                handleOpenFileOrFolder("file", files[0].path, data)
+              }
+            >
               打开文件
             </span>
             <span
-              onClick={() => handleOpenFileOrFolder("folder", files[0].path)}
+              onClick={() =>
+                handleOpenFileOrFolder("folder", files[0].path, data)
+              }
             >
               打开文件夹
             </span>
@@ -549,12 +552,19 @@ const App = () => {
    * 调用electron的方法，打开下载后的文件所在的目录/打开文件
    * @param type 文件类型 文件/文件夹
    * @param path 路径
+   * @param rawData 原数据
    * @returns
    */
-  const handleOpenFileOrFolder = (type: "folder" | "file", path: string) => {
+  const handleOpenFileOrFolder = (
+    type: "folder" | "file",
+    path: string,
+    rawData
+  ) => {
     //适用于Windows和Mac的Node.js —正斜杠，反斜杠纠正
     path = node_path.normalize(path);
     if (!node_fs.existsSync(path)) {
+      rawData.status = "noLocalFile";
+      aria2cModule.setNoLocalFileTasks("add", rawData);
       message.error({
         content: `未找到文件，${
           type == "file" ? "文件" : "文件夹"
@@ -587,12 +597,18 @@ const App = () => {
    */
   const handleDeleteDownloadTask = () => {
     // 1、通知aria2c把对应的下载任务队列删除了
-    // 2、如有勾选删除本地文件的话，就要把文件一起删除了
-    aria2cModule.deleteTask(curDeleteDownloadTaskInfo.gid);
+    // 2、如有勾选删除本地文件的话，就要把对应的文件和临时缓存一起删除了
+    aria2cModule.deleteTask(
+      curDeleteDownloadTaskInfo.gid,
+      curDeleteDownloadTaskInfo
+    );
+    aria2cModule.setNoLocalFileTasks("delete", curDeleteDownloadTaskInfo);
 
     if (deleteLocalFileCheckBox) {
       try {
-        node_fs.rmSync(curDeleteDownloadTaskInfo.files[0].path);
+        let path = node_path.normalize(curDeleteDownloadTaskInfo.files[0].path);
+        node_fs.rmSync(path);
+        node_fs.rmSync(path + ".aria2"); //临时缓存文件
       } catch (error) {
         console.log(error, "删除本地文件失败");
       }
@@ -625,14 +641,10 @@ const App = () => {
             <List.Item.Meta
               avatar={
                 <>
-                  <img
-                    src="https://www.baidu.com/img/flexible/logo/pc/result.png"
-                    width={48}
-                    height={48}
-                  />
+                  <img src={item.fileIcon} width={48} height={48} />
                   {/* 如果文件目录被移除，则图标显示上没有文件
                   如果文件错误的话，有个错误的标志 */}
-                  {item.status == "removed" ? (
+                  {item.status == "removed" || item.status == "noLocalFile" ? (
                     <CloseCircleFilled className="icon no-local-file" />
                   ) : item.status == "error" ? (
                     <CloseCircleFilled className="icon download-fail" />
@@ -697,10 +709,13 @@ const App = () => {
       <Modal
         title="删除下载任务"
         visible={visibleDeleteDownloadTaskModal}
-        footer={null}
-        wrapClassName="delete-download-task-box"
         width={420}
+        footer={null}
         onCancel={cancelDeleteDownloadTaskModal}
+        wrapClassName="delete-download-task-box"
+        centered
+        keyboard={false}
+        maskClosable={false}
       >
         <p>
           <ExclamationCircleFilled className="delete-icon" />

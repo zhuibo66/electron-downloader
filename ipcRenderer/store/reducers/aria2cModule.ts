@@ -6,6 +6,7 @@ class aria2cModule {
   refreshLoopId: null | number = null; //aria2c获取任务的定时器
   rpc: AriaJsonRPC = null;
   tasks: Map<string, Task> = new Map();
+  noLocalFileTasks: Map<string, Task> = new Map(); //当本地文件被删除了，但是在aria2c那边无法更改其状态，所以我们在获取到最新的tasks后，过滤下
   @Update
   update() {}
 
@@ -16,9 +17,28 @@ class aria2cModule {
 
   refreshTasks() {
     this.rpc.getTasksAndStatus().then(({ tasks, stat }) => {
+      const keys: any = tasks.keys();
+      for (const key of keys) {
+        if (this.noLocalFileTasks.has(key)) {
+          tasks.set(key, this.noLocalFileTasks.get(key));
+        }
+      }
+
       this.tasks = tasks;
       this.update();
     });
+  }
+
+  setNoLocalFileTasks(type: "add" | "delete", noLocalFileTasks: Task) {
+    switch (type) {
+      case "add":
+        this.noLocalFileTasks.set(noLocalFileTasks.gid, noLocalFileTasks);
+        break;
+      case "delete":
+        this.noLocalFileTasks.delete(noLocalFileTasks.gid);
+        break;
+    }
+    this.update();
   }
 
   //连接rpc
@@ -176,17 +196,24 @@ class aria2cModule {
    * 删除下载
    * @param gid
    */
-  deleteTask(gid: string) {
-    this.rpc
-      .call("aria2.remove", [gid])
-      .then(() => {
+  deleteTask(gid: string, fullData) {
+    if (fullData.status == "complete" || fullData.status == "noLocalFile") {
+      //此方法 从内存中删除由gid表示的已完成/错误/已删除下载。此方法返回OK成功
+      this.rpc.call("aria2.removeDownloadResult", [gid]).then(() => {
         this.refreshTasks();
-      })
-      .catch(() => {
-        this.rpc.call("aria2.forceRemove", [gid]).then(() => {
-          this.refreshTasks();
-        });
       });
+    } else {
+      this.rpc
+        .call("aria2.remove", [gid])
+        .then(() => {
+          this.refreshTasks();
+        })
+        .catch(() => {
+          this.rpc.call("aria2.forceRemove", [gid]).then(() => {
+            this.refreshTasks();
+          });
+        });
+    }
   }
 
   /**
@@ -225,7 +252,8 @@ type Status =
   | "paused"
   | "error"
   | "complete"
-  | "removed";
+  | "removed"
+  | "noLocalFile";
 export interface Task {
   bitfield?: string;
   bittorrent?: {
@@ -268,6 +296,7 @@ export interface Task {
   uploadLength: string;
   uploadSpeed: string;
   fileName: string;
+  fileIcon: string;
 }
 // union type from tuple, see
 // https://stackoverflow.com/questions/45251664/typescript-derive-union-type-from-tuple-array-values

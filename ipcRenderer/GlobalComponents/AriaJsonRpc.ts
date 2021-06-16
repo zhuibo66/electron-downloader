@@ -17,6 +17,7 @@ const getAllTasksMethods = [
   { methodName: "aria2.tellWaiting", args: [0, 100] },
   { methodName: "aria2.tellStopped", args: [0, 100] },
 ];
+const { electron } = window;
 
 export default class AriaJsonRpc {
   url: string;
@@ -123,7 +124,7 @@ export default class AriaJsonRpc {
       throw error;
     }
   }
-  
+
   getFileName(file) {
     if (!file) {
       return "";
@@ -143,6 +144,15 @@ export default class AriaJsonRpc {
     return path.substring(index + 1);
   }
 
+  async getFileIcon(file) {
+    if (file.status == "complete") {
+      let path = file.files[0].path;
+      return await electron.ipcRenderer.invoke("getFileIcon", path);
+    } else {
+      return await electron.ipcRenderer.invoke("getFileIcon");
+    }
+  }
+
   async getTasksAndStatus() {
     const methods = getAllTasksMethods.concat([
       {
@@ -155,7 +165,8 @@ export default class AriaJsonRpc {
     for (const ts of [active, waiting, stopped]) {
       for (const t of ts) {
         t.fileName = this.getFileName(t.files[0]);
-        tasks.set(t.gid, t);
+        t.fileIcon = await this.getFileIcon(t);
+        tasks.set(t.gid, t)
       }
     }
     return { tasks, stat: stat as any };

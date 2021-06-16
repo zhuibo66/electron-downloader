@@ -35,4 +35,9 @@ export default {
     }
     return bytes + " " + symbols[i];
   },
+  //计算剩余时间
+  timeRemaining(totalLength, completedLength, downloadSpeed) {
+    const remainingLength = totalLength - completedLength;
+    return Math.ceil(remainingLength / downloadSpeed);
+  },
 };
