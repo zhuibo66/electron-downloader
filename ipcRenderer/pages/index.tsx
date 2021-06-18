@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import {
   List,
   Modal,
-  Avatar,
   Button,
-  Skeleton,
   Tooltip,
   Form,
   Row,
@@ -21,7 +19,7 @@ import {
   DownOutlined,
   MinusCircleOutlined,
   PlusOutlined,
-  PauseOutlined,
+  DeleteOutlined,
   MinusOutlined,
   ExclamationCircleFilled,
   CloseCircleFilled,
@@ -49,7 +47,6 @@ interface FileObject {
 const App = () => {
   const { node_path, electron, node_fs } = window;
   const { aria2cModule } = useModule();
-  const [list, setList] = useState<Array<FileObject>>([]);
   const [initLoading, setInitLoading] = useState<boolean>(false);
   const [visibleAddDownloadTaskModal, setVisibleAddDownloadTaskModal] =
     useState<boolean>(false);
@@ -62,6 +59,7 @@ const App = () => {
 
   const [expand, setExpand] = useState(false);
   const [form] = Form.useForm();
+  
   //验证所有表单格式是否正确
   const [validAllFormFormatStatus, setValidAllFormFormatStatus] =
     useState<boolean>(true);
@@ -383,21 +381,21 @@ const App = () => {
    * @param values
    */
   const handleAddDownloadTask = (values) => {
-    let requestHeaders = [];
+    let requestHeaders = new Map();
     try {
       // let urlFormat = new URL(values.downloadUrl);
-      requestHeaders.push(`referer:${values.downloadUrl}`);
+      requestHeaders.set("referer", values.downloadUrl);
     } catch (error) {}
     if (values.headers) {
-      requestHeaders.concat(
-        values.headers.map((item) => {
-          return `${item.key}:${item.value}`;
-        })
-      );
+      values.headers.forEach((item) => {
+        requestHeaders.set(item.key, item.value);
+      });
     }
     aria2cModule.addUris([values.downloadUrl], {
       dir: values.fileSavePath.replace(/\\\\/g, "\\"),
-      header: requestHeaders.join(" "),
+      header: Array.from(requestHeaders)
+        .map((item) => `${item[0]}:${item[1]}`)
+        .join(" "),
     });
     setVisibleAddDownloadTaskModal(false);
     setExpand(false);
@@ -617,16 +615,39 @@ const App = () => {
     cancelDeleteDownloadTaskModal();
   };
 
+  /**
+   * 清空所有已下载的
+   */
+  const cleanEmptyDownloadTask = () => {
+    aria2cModule.cleanEmptyTask();
+  };
+
   return (
     <div className="App">
       <List
         header={
-          <>
-            <p onClick={openAddDownloadTaskModal}>新建下载</p>
-          </>
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openAddDownloadTaskModal()}
+              style={{
+                marginLeft: 10,
+              }}
+            >
+              新建下载
+            </Button>
+            <Button
+              type="default"
+              icon={<DeleteOutlined />}
+              onClick={() => cleanEmptyDownloadTask()}
+            >
+              清空已下载
+            </Button>
+          </Space>
         }
         locale={{
-          emptyText: <Empty description="暂无数据" />,
+          emptyText: <Empty description="您下载的文件将会出现在这里" />,
         }}
         className="download-list"
         loading={initLoading}

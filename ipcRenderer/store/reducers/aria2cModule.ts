@@ -242,6 +242,15 @@ class aria2cModule {
       this.refreshTasks();
     });
   }
+
+  /**
+   * 清空所有已下载的
+   */
+  cleanEmptyTask(){
+    this.rpc.call("aria2.purgeDownloadResult", []).then(() => {
+      this.refreshTasks();
+    });    
+  }
 }
 
 export default new aria2cModule();
