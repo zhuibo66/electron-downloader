@@ -21,11 +21,12 @@ module.exports = {
     const sessionPath = path.join(__dirname, "save", "session");
     //获取用户下载目录的路径
     const downloadPath = await ipcRenderer.invoke("getDownloadDir");
+    console.log(downloadPath, "downloadPath");
     const ariaPath =
       process.platform === "win32"
-        ? path.join(__dirname, "../", "bin", "win64", "aria2c.exe")
+        ? path.join(__dirname, "bin", "win64", "aria2c.exe")
         : process.platform === "darwin"
-        ? path.join(__dirname, "../", "bin", "macOS", "aria2c")
+        ? path.join(__dirname, "bin", "macOS", "aria2c")
         : "aria2c";
     const args = [
       // `--dir=${downloadPath}`,

@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import {
   List,
   Modal,
@@ -44,6 +44,8 @@ interface FileObject {
   [index: string]: any;
 }
 
+// (window as any).audioControler = new Audio("../static/musics/Alarm02.wav");
+
 const App = () => {
   const { node_path, electron, node_fs } = window;
   const { aria2cModule } = useModule();
@@ -59,7 +61,7 @@ const App = () => {
 
   const [expand, setExpand] = useState(false);
   const [form] = Form.useForm();
-  
+
   //验证所有表单格式是否正确
   const [validAllFormFormatStatus, setValidAllFormFormatStatus] =
     useState<boolean>(true);

@@ -1,4 +1,10 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  Notification,
+} = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { getAriaProc, killAriaProc } = require("./Aria2cControler");
@@ -30,6 +36,7 @@ function createWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+  mainWindow.on("maximize", () => {});
 }
 
 app.on("ready", () => {
@@ -41,6 +48,10 @@ app.on("ready", () => {
   // installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
   //   .then((name) => console.log(`Added Extension:  ${name}`))
   //   .catch((err) => console.log("An error occurred: ", err));
+
+  //这里appId一定要填写，且必须与package.json中的appId一致，才能给系统推送通知，
+  //推送通知是需要先安装好应用程序的
+  app.setAppUserModelId("xxxx");
   createWindow();
 });
 
@@ -64,6 +75,17 @@ app.on("activate", () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+//推送消息给系统，告知那些文件已下载成功
+ipcMain.handle("Notification", (event, data) => {
+  const { title, body } = data;
+  new Notification({
+    // 通知的标题, 将在通知窗口的顶部显示
+    title,
+    // 通知的正文文本, 将显示在标题或副标题下面
+    body: title,
+  }).show();
 });
 
 //获取用户下载目录的路径
