@@ -1,9 +1,9 @@
-## 开发背景
+### 开发背景
 电脑系统：Windows 10企业版G
 electron：13.1.2
 electron-builder：22.11.7
 
-## 先过一遍Electron中关于通知的文档
+### 先过一遍Electron中关于通知的文档
 网址：<a href="https://www.electronjs.org/docs/tutorial/notifications" target="_blank">Electron 文档
 Docs / Guides / 通知 (Windows, Linux, macOS) </a>
 
@@ -16,7 +16,7 @@ Docs / Guides / 通知 (Windows, Linux, macOS) </a>
 按`Win键+R`进入运行窗口，输入并执行`shell:Common Programs`命令
 
 
-## 开发环境下怎么使用并开启通知？
+### 开发环境下怎么使用并开启通知？
 
 1、打开开始菜单的路径，然后右键->新建——>快捷方式->选择自己项目下的node_modules\electron\dist\electron.exe->点击下一步->点击完成
 
@@ -40,11 +40,11 @@ function showNotification () {
 app.whenReady().then(createWindow).then(showNotification)
 ```
 
-## 生产环境下怎么使用并开启通知？
+### 生产环境下怎么使用并开启通知？
 
 由于生成环境下，已经打包成了安装包，而安装后，就会把对应的程序添加到开始菜单中（也就相当于生成环境的步骤1），所以我们不需要做步骤1了，而接下来的的步骤2，3都是一样的，直接copy代码就好了。
 
-## 都按照上面的步骤做了，还是没有显示通知？
+### 都按照上面的步骤做了，还是没有显示通知？
 
 1、首先，用`Notification.isSupported()`看下当前系统是不是支持通知，如果返回的true，既是支持，否则不支持。
 
@@ -56,7 +56,7 @@ app.whenReady().then(createWindow).then(showNotification)
 
 ![image-20210626171401985](https://i.loli.net/2021/06/26/EeGIdJml3VhaNRW.png)
 
-## 手动把应用添加到开始菜单中，好麻烦啊，有没有自动化啊？
+### 手动把应用添加到开始菜单中，好麻烦啊，有没有自动化啊？
 
 有的，我们的原则就是代码能做的，坚决不手动，哈哈哈，代码如下：
 ```electron
@@ -79,7 +79,7 @@ if (process.platform === 'win32') {
 ```
 参考资料：<a href="https://www.tabnine.com/code/javascript/functions/electron/Shell/writeShortcutLink" target="_blank">https://www.tabnine.com/code/javascript/functions/electron/Shell/writeShortcutLink</a>
 
-## 20210627更新
+### 20210627更新
 
 惊呆了，相同的代码，换了台电脑，啥都不用设置，直接就可以显示通知，文章是不是白写了？
 
