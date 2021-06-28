@@ -44,8 +44,6 @@ interface FileObject {
   [index: string]: any;
 }
 
-// (window as any).audioControler = new Audio("../static/musics/Alarm02.wav");
-
 const App = () => {
   const { node_path, electron, node_fs } = window;
   const { aria2cModule } = useModule();
@@ -454,7 +452,7 @@ const App = () => {
    * @returns
    */
   const renderAction = (data) => {
-    const { status, files, gid } = data;
+    const { status, files, gid, fileName } = data;
     // files[0].path 文件路径
     const actionsArr = [];
     switch (status) {

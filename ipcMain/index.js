@@ -4,10 +4,28 @@ const {
   ipcMain,
   dialog,
   Notification,
+  shell,
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { getAriaProc, killAriaProc } = require("./Aria2cControler");
+if (process.platform === "win32") {
+  //通知的具体注意事项查看项目中的，electron-Notification使用方法.md
+  let shortcut = path.join(
+    process.env.ALLUSERSPROFILE,
+    "Microsoft",
+    "Windows",
+    "Start Menu",
+    "Programs",
+    "electron.lnk"
+  );
+  let res = shell.writeShortcutLink(shortcut, {
+    target: process.execPath,
+    appUserModelId: process.execPath,
+    iconIndex: 0,
+  });
+  console.log(res, "Shortcut created");
+}
 // const log=require('electron-log');
 let mainWindow = null;
 const debug = /--debug/.test(process.argv[2]);
@@ -49,9 +67,7 @@ app.on("ready", () => {
   //   .then((name) => console.log(`Added Extension:  ${name}`))
   //   .catch((err) => console.log("An error occurred: ", err));
 
-  //这里appId一定要填写，且必须与package.json中的appId一致，才能给系统推送通知，
-  //推送通知是需要先安装好应用程序的
-  app.setAppUserModelId("xxxx");
+  app.setAppUserModelId(process.execPath);
   createWindow();
 });
 
@@ -78,13 +94,12 @@ app.on("activate", () => {
 });
 
 //推送消息给系统，告知那些文件已下载成功
-ipcMain.handle("Notification", (event, data) => {
+ipcMain.handle("showNotification", (event, data) => {
   const { title, body } = data;
   new Notification({
-    // 通知的标题, 将在通知窗口的顶部显示
-    title,
-    // 通知的正文文本, 将显示在标题或副标题下面
-    body: title,
+    title, // 通知的标题, 将在通知窗口的顶部显示
+    body, // 通知的正文文本, 将显示在标题或副标题下面
+    silent: true, //在显示通知时是否发出系统提示音。
   }).show();
 });
 

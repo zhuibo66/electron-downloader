@@ -1,6 +1,7 @@
 import { Update } from "../actions/index";
 import AriaJsonRPC from "@/GlobalComponents/AriaJsonRpc";
 const { launchAria, hostUrl, secret } = window.Aria2cControler;
+const { electron } = window;
 class aria2cModule {
   connectionState: null | boolean = null; //aria2c连接的状态
   refreshLoopId: null | number = null; //aria2c获取任务的定时器
@@ -61,8 +62,8 @@ class aria2cModule {
     for (const event in eventHandlers) {
       const func = eventHandlers[event];
       this.rpc.on(event, (message) => {
-        func();
         this.onAriaNotification(event, message);
+        func();
       });
     }
     this.rpc.connect(
@@ -109,34 +110,26 @@ class aria2cModule {
   //收到Aria的异步提示的消息，优先级最高
   onAriaNotification(method, response) {
     console.log("onAriaNotification", method, response);
-    // const { gid } = response;
-    // if (!this.props.server.tasks.has(gid)) {
-    //   console.warn(`task with gid ${gid} cannot be found`);
-    // }
-    // const task = this.props.server.tasks.get(gid);
-    // const name = getName(task);
-    // switch (method) {
-    //   case "aria2.onDownloadStart":
-    //     console.log(`Task "${name}" started`);
-    //     break;
-    //   case "aria2.onDownloadPause":
-    //     console.log(`Task "${name}" paused`);
-    //     break;
-    //   case "aria2.onDownloadStop":
-    //     console.log(`Task "${name}" stopped`);
-    //     break;
-    //   case "aria2.onDownloadComplete":
-    //     console.log(`Task "${name}" completed`, "success");
-    //     break;
-    //   case "aria2.onDownloadError":
-    //     console.log(`Task "${name}" has error`, "error");
-    //     break;
-    //   case "aria2.onBtDownloadComplete":
-    //     console.log(`Task "${name}" completed`);
-    //     break;
-    //   default:
-    //     break;
-    // }
+    const { gid } = response;
+    if (!this.tasks.has(gid)) {
+      console.warn(`task with gid ${gid} cannot be found`);
+    }
+    const task = this.tasks.get(gid);
+    const name = task.fileName;
+    let eventDesc = {
+      "aria2.onDownloadComplete": () => {
+        electron.ipcRenderer.invoke("showNotification", {
+          title: "",
+          body: name + "——" + "下载已完成",
+        });
+      },
+      "aria2.onDownloadStart": () => {},
+      "aria2.onDownloadPause": () => {},
+      "aria2.onDownloadStop": () => {},
+      "aria2.onDownloadError": () => {},
+      "aria2.onBtDownloadComplete": () => {},
+    };
+    eventDesc[method] && eventDesc[method]();
   }
 
   //收到Aria的正确的回应
@@ -246,10 +239,10 @@ class aria2cModule {
   /**
    * 清空所有已下载的
    */
-  cleanEmptyTask(){
+  cleanEmptyTask() {
     this.rpc.call("aria2.purgeDownloadResult", []).then(() => {
       this.refreshTasks();
-    });    
+    });
   }
 }
 
