@@ -1,6 +1,6 @@
 {
   "name": "my-downloader",
-  "version": "1.0.0",
+  "version": "0.6.0",
   "description": "",
   "main": "ipcMain/index.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "build": {
     "appId": "com.electron.downloader",
     "productName": "my-downloader",
-    "copyright": "版本信息",
+    "copyright": "0.6.0",
     "asar": false,
     "directories": {
       "output": "release"
