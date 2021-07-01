@@ -1,26 +1,42 @@
 {
-  "name": "my-app",
+  "name": "my-downloader",
   "version": "1.0.0",
   "description": "",
   "main": "ipcMain/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "build:win": "electron-builder",
+    "build:web": "webpack",
+    "build:win": "electron-builder --win",
     "dev": "set NODE_ENV=development && webpack server",
-    "electron": "electron ./ipcMain/index.js"
+    "electron": "chcp 65001 && electron ./ipcMain/index.js"
   },
   "build": {
-    "appId": "xxxx",
-    "productName": "下载器",
+    "appId": "com.electron.downloader",
+    "productName": "my-downloader",
     "copyright": "版本信息",
-    "asar":false,
+    "asar": false,
     "directories": {
-      "output": "build"
+      "output": "release"
     },
     "files": [
-      "ipcMain"
-    ]
+      "ipcMain",
+      "build"
+    ],
+    "win": {
+      "target": [{
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "author": "",
   "license": "ISC",
@@ -34,6 +50,7 @@
     "@types/react-redux": "^7.1.16",
     "babel": "^6.23.0",
     "babel-loader": "^8.2.2",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
     "core-js": "^3.13.0",
     "css-loader": "^5.2.6",
     "electron": "^13.1.2",

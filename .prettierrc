@@ -1,0 +1,22 @@
+{
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[less]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "tabWidth": 4,
+    "printWidth": 160,
+    "bracketSpacing": true,
+    "semi": true,
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "jsxBracketSameLine": false,
+    "jsxSingleQuote": false
+}

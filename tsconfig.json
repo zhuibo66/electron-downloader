@@ -12,10 +12,9 @@
                 "ipcRenderer/assets/styles/*"
             ]
         },
-        "experimentalDecorators": true,//有使用装饰器要添加
+        "experimentalDecorators": true, //有使用装饰器要添加
         "esModuleInterop": true,
         "jsx": "react",
-        
     },
     "include": [
         "ipcRenderer/**/*"

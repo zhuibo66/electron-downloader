@@ -1,112 +1,112 @@
 .add-download-task-operate-box {
-  .ant-input-group-addon {
-    padding: 0;
-    .icon {
-      width: 38px;
-      height: 30px;
-      line-height: 34px;
+    .ant-input-group-addon {
+        padding: 0;
+        .icon {
+            width: 38px;
+            height: 30px;
+            line-height: 34px;
+        }
     }
-  }
 }
 .delete-download-task-box {
-  .ant-modal-body {
-    padding-bottom: 0;
-  }
-  p {
-    text-align: center;
-    padding: 10px;
-    &:first-child {
-      .delete-icon {
-        color: #faad14;
-        font-size: 30px;
-        vertical-align: middle;
-        margin-right: 10px;
-      }
+    .ant-modal-body {
+        padding-bottom: 0;
     }
-    &:last-child {
-      //这里有个知识点，子元素下都是浮动元素的话，会造成父元素高度塌陷
-      //解决方法 1、父元素的尾部添加个块级元素（伪类）来清除浮动
-      // 2、给父元素设置overflow:auto
-      // 3、给父元素设置成绝对定位，
-      //相关资料：https://blog.csdn.net/cc18868876837/article/details/79925666
-      &::after {
-        display: block;
-        content: "";
-        clear: both;
-      }
-      .left {
-        float: left;
-      }
-      .right {
-        float: right;
-        button {
-          margin-right: 10px;
+    p {
+        text-align: center;
+        padding: 10px;
+        &:first-child {
+            .delete-icon {
+                color: #faad14;
+                font-size: 30px;
+                vertical-align: middle;
+                margin-right: 10px;
+            }
         }
-      }
+        &:last-child {
+            //这里有个知识点，子元素下都是浮动元素的话，会造成父元素高度塌陷
+            //解决方法 1、父元素的尾部添加个块级元素（伪类）来清除浮动
+            // 2、给父元素设置overflow:auto
+            // 3、给父元素设置成绝对定位，
+            //相关资料：https://blog.csdn.net/cc18868876837/article/details/79925666
+            &::after {
+                display: block;
+                content: '';
+                clear: both;
+            }
+            .left {
+                float: left;
+            }
+            .right {
+                float: right;
+                button {
+                    margin-right: 10px;
+                }
+            }
+        }
     }
-  }
 }
 .download-list {
-  //让空数据，居中
-  .ant-list-empty-text {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: calc(100vh - 57px);
-  }
-  p {
-    margin: 0;
-  }
-  ul.ant-list-items {
-    > .file-list {
-      position: relative;
-      padding: 10px 0;
-      &.status-complete {
-        .progress {
-          display: none;
+    //让空数据，居中
+    .ant-list-empty-text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: calc(100vh - 57px);
+    }
+    p {
+        margin: 0;
+    }
+    ul.ant-list-items {
+        > .file-list {
+            position: relative;
+            padding: 10px 0;
+            &.status-complete {
+                .progress {
+                    display: none;
+                }
+            }
+            &.status-error {
+                background: #ffeaea;
+            }
+            .progress {
+                position: absolute;
+                height: 100%;
+                background: #e2eeff;
+                z-index: -1;
+            }
+            .ant-list-item-meta-avatar {
+                margin-left: 10px;
+            }
         }
-      }
-      &.status-error {
-        background: #ffeaea;
-      }
-      .progress {
-        position: absolute;
-        height: 100%;
-        background: #e2eeff;
-        z-index: -1;
-      }
-      .ant-list-item-meta-avatar {
-        margin-left: 10px;
-      }
     }
-  }
-  ul.ant-list-item-action {
-    li {
-      cursor: pointer;
-      > span {
-        padding: 10px;
-      }
+    ul.ant-list-item-action {
+        li {
+            cursor: pointer;
+            > span {
+                padding: 10px;
+            }
+        }
     }
-  }
-  .ant-list-item-meta-avatar {
-    position: relative;
-    .icon {
-      position: absolute;
-      bottom: 0;
-      right: 2px;
+    .ant-list-item-meta-avatar {
+        position: relative;
+        .icon {
+            position: absolute;
+            bottom: 0;
+            right: 2px;
+        }
+        .no-local-file {
+            color: #ff4d4f;
+        }
+        .download-fail {
+            color: #faad14;
+        }
     }
-    .no-local-file {
-      color: #ff4d4f;
+    .download-info {
+        > span:first-child {
+            display: inline-block;
+            width: 160px;
+            margin-right: 30px;
+        }
     }
-    .download-fail {
-      color: #faad14;
-    }
-  }
-  .download-info {
-    > span:first-child {
-      display: inline-block;
-      width: 160px;
-      margin-right: 30px;
-    }
-  }
 }
