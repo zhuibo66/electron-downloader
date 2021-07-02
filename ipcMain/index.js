@@ -5,12 +5,14 @@ const { getAriaProc, killAriaProc } = require('./Aria2cControler');
 if (process.platform === 'win32') {
     //通知的具体注意事项查看项目中的，electron-Notification使用方法.md
     let shortcut = path.join(process.env.ALLUSERSPROFILE, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'my-downloader.lnk');
-    let res = shell.writeShortcutLink(shortcut, {
-        target: process.execPath,
-        appUserModelId: process.execPath,
-        iconIndex: 0,
-    });
-    console.log(res, 'Shortcut created');
+    if(!fs.existsSync(shortcut)){
+        let res = shell.writeShortcutLink(shortcut, {
+            target: process.execPath,
+            appUserModelId: process.execPath,
+            iconIndex: 0,
+        });
+        console.log(res, 'Shortcut created');
+    }
 }
 // const log=require('electron-log');
 let mainWindow = null;
