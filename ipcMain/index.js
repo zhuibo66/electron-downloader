@@ -1,11 +1,11 @@
-const { app, BrowserWindow, ipcMain, dialog, Notification, shell, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Notification, shell, Menu, BrowserView } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { getAriaProc, killAriaProc } = require('./Aria2cControler');
 if (process.platform === 'win32') {
     //通知的具体注意事项查看项目中的，electron-Notification使用方法.md
     let shortcut = path.join(process.env.ALLUSERSPROFILE, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'my-downloader.lnk');
-    if(!fs.existsSync(shortcut)){
+    if (!fs.existsSync(shortcut)) {
         let res = shell.writeShortcutLink(shortcut, {
             target: process.execPath,
             appUserModelId: process.execPath,
@@ -16,25 +16,39 @@ if (process.platform === 'win32') {
 }
 // const log=require('electron-log');
 let mainWindow = null;
+let loadingView = null;
 const debug = /--debug/.test(process.argv[2]);
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 600,
         height: 400,
-        minHeight: 400,
         minWidth: 600,
+        minHeight: 400,
         webPreferences: {
             preload: path.join(__dirname, '/preload.js'),
         },
+        show: false, // 隐藏窗口
     });
     mainWindow.loadURL(debug || !app.isPackaged ? `http://localhost:8080/` : path.join('file://', __dirname, '../build/index.html'));
     // mainWindow.loadURL(path.join("file://", __dirname, "../build/index.html"));
     // mainWindow.loadFile(path.join(__dirname, "../build/index.html"));
 
+    // 创建View遮罩（目的是electron在开启的时候会有短暂的白屏，这里加个loading遮罩，优化体验）
+    loadingView = new BrowserView({});
+    loadingView.setBounds({ x: 0, y: 0, height: 400, width: 600 });
+    loadingView.webContents.loadURL(path.join('file://', __dirname, './loading.html'));
+    mainWindow.setBrowserView(loadingView);
+
+    // 显示窗口
+    loadingView.webContents.on('dom-ready', () => {
+        mainWindow.show();
+    });
+
     //判断是否 --debug或者应用是否打包（打包true/未打包false），打开开发者工具，窗口最大化，
     if (debug || !app.isPackaged) {
         mainWindow.webContents.openDevTools();
         mainWindow.maximize();
+        loadingView && loadingView.setBounds(mainWindow.getBounds());
     } else {
         //隐藏菜单栏
         Menu.setApplicationMenu(null);
@@ -82,6 +96,9 @@ app.on('activate', () => {
         createWindow();
     }
 });
+
+// 关闭遮罩
+ipcMain.handle('closeLoadingView', () => loadingView && mainWindow.removeBrowserView(loadingView));
 
 //推送消息给系统，告知那些文件已下载成功
 ipcMain.handle('showNotification', (event, data) => {

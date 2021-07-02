@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { List, Modal, Button, Tooltip, Form, Row, Col, Input, Space, Empty, Checkbox, message } from 'antd';
 import {
     EllipsisOutlined,
@@ -519,6 +519,13 @@ const App = () => {
     const cleanEmptyDownloadTask = () => {
         aria2cModule.cleanEmptyTask();
     };
+
+    /**
+     * 当组件加载完毕，通知主进程，关闭加载中的遮罩
+     */
+    useEffect(() => {
+        electron.ipcRenderer.invoke('closeLoadingView');
+    }, []);
 
     return (
         <div className="App">
