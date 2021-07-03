@@ -115,7 +115,7 @@ class aria2cModule {
             'aria2.onDownloadComplete': () => {
                 electron.ipcRenderer.invoke('showNotification', {
                     title: '亲爱的主人',
-                    body: name + '——' + '下载已完成',
+                    body: (name.length > 40 ? name.substring(0, 40) + '...' : name) + '——' + '下载已完成',
                 });
             },
             'aria2.onDownloadStart': () => {},

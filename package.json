@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:web": "webpack",
     "build:win": "electron-builder --win",
-    "dev": "set NODE_ENV=development && webpack server",
-    "electron": "chcp 65001 && electron ./ipcMain/index.js"
+    "dev:web": "set NODE_ENV=development && webpack server",
+    "dev:electron": "chcp 65001 && electron ./ipcMain/index.js"
   },
   "build": {
     "appId": "com.electron.downloader",
