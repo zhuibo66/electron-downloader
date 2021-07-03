@@ -124,7 +124,7 @@ const App = () => {
             </Col>,
         ];
         const expandCol = [
-            <Col span={24} key="5">
+            <Col span={24} key="5" className="http-header-options">
                 <>
                     <p>
                         Header 设置<small>/请求头设置</small>
@@ -589,7 +589,7 @@ const App = () => {
                 <Form
                     form={form}
                     name="advanced_search"
-                    className="ant-advanced-search-form"
+                    className="add-download-task-operate-form"
                     onFinish={handleAddDownloadTask}
                     labelAlign="left"
                     labelCol={{ span: 4 }}
