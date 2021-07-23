@@ -188,6 +188,11 @@ class aria2cModule {
             this.rpc.call('aria2.removeDownloadResult', [gid]).then(() => {
                 this.refreshTasks();
             });
+        } else if (fullData.status == 'error') {
+            //对于文件状态出错的话，调用这个参数来删除
+            this.rpc.call('aria2.removeDownloadResult', [gid]).then(() => {
+                this.refreshTasks();
+            });
         } else {
             this.rpc
                 .call('aria2.remove', [gid])

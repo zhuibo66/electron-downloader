@@ -319,6 +319,8 @@ const App = () => {
         let requestHeaders = new Map();
         try {
             // let urlFormat = new URL(values.downloadUrl);
+            //去除下载地址的头尾空格
+            values.downloadUrl=values.downloadUrl.trim();
             requestHeaders.set('referer', values.downloadUrl);
         } catch (error) {}
         if (values.headers) {
