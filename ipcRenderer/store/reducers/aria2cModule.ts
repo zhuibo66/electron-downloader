@@ -193,6 +193,13 @@ class aria2cModule {
             this.rpc.call('aria2.removeDownloadResult', [gid]).then(() => {
                 this.refreshTasks();
             });
+        } else if (fullData.status == 'active' || fullData.status == 'paused') {
+            //任务正在下载中，先暂停，然后再删除任务
+            this.rpc.call('aria2.pause', [gid]).then(() => {
+                this.rpc.call('aria2.remove', [gid]).then(() => {
+                    this.refreshTasks();
+                });
+            });
         } else {
             this.rpc
                 .call('aria2.remove', [gid])
@@ -200,9 +207,16 @@ class aria2cModule {
                     this.refreshTasks();
                 })
                 .catch(() => {
-                    this.rpc.call('aria2.forceRemove', [gid]).then(() => {
-                        this.refreshTasks();
-                    });
+                    this.rpc
+                        .call('aria2.forceRemove', [gid])
+                        .then(() => {
+                            this.refreshTasks();
+                        })
+                        .catch(() => {
+                            this.rpc.call('aria2.removeDownloadResult', [gid]).then(() => {
+                                this.refreshTasks();
+                            });
+                        });
                 });
         }
     }

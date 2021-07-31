@@ -206,6 +206,10 @@ function getImageSuffix(fileBuffer) {
     return false;
 }
 
+/**
+ * 获取文件图标
+ * filePath：文件完整的路径
+ */
 ipcMain.handle('getFileIcon', async (event, filePath) => {
     const defaultFileIconPath = path.join(__dirname, './static/images/icon_default.png');
     const iconDefault = await imgToBase64(defaultFileIconPath);
@@ -214,4 +218,18 @@ ipcMain.handle('getFileIcon', async (event, filePath) => {
         size: 'large',
     });
     return icon.toDataURL();
+});
+
+/**
+ * 设置右键菜单
+ * data：{ label: '复制', role: 'copy' } || { label: '粘贴', role: 'paste' }
+ */
+ipcMain.handle('setMenu', async (event, data) => {
+    // 法一
+    // let menu = new Menu();
+    // menu.append(new MenuItem(data));
+
+    // 法二
+    let menu = Menu.buildFromTemplate([data]);
+    menu.popup();
 });
