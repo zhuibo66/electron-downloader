@@ -320,8 +320,8 @@ const App = () => {
         try {
             // let urlFormat = new URL(values.downloadUrl);
             //去除下载地址的头尾空格
-            values.downloadUrl=values.downloadUrl.trim();
-            requestHeaders.set('referer', values.downloadUrl);
+            values.downloadUrl = values.downloadUrl.trim();
+            requestHeaders.set('Referer', values.downloadUrl.match(/[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?/g)[0]);
         } catch (error) {}
         if (values.headers) {
             values.headers.forEach(item => {
@@ -366,7 +366,7 @@ const App = () => {
                 {status == 'removed' || status == 'noLocalFile' ? (
                     <span>文件已删除</span>
                 ) : status == 'error' ? (
-                    <span>下载失败：{errorMessage}</span>
+                    <span title={errorMessage}>下载失败：{errorMessage}</span>
                 ) : status == 'complete' ? null : status == 'paused' ? (
                     <span>0 B/s</span>
                 ) : (
@@ -572,7 +572,7 @@ const App = () => {
                                     ) : null}
                                 </>
                             }
-                            title={<p>{item.fileName}</p>}
+                            title={<p title={item.fileName}>{item.fileName}</p>}
                             description={renderDescription(item)}
                         />
                     </List.Item>
