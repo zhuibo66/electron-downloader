@@ -113,10 +113,20 @@
         }
     }
     .download-info {
-        > span:first-child {
-            display: inline-block;
-            width: 160px;
-            margin-right: 30px;
+        > span {
+            &:first-child {
+                display: inline-block;
+                width: 160px;
+                margin-right: 30px;
+            }
+            &:last-child {
+                display: inline-block;
+                width: calc(100% - 200px);
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                vertical-align: middle;
+            }
         }
     }
 }
